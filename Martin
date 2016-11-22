@@ -1,4 +1,79 @@
-# public void stepProgram() {
+package m;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static javax.swing.JOptionPane.*;
+
+public class M extends Object {
+
+    private static final int IREAD = 10; // Flere ...
+    private final int RAM_SIZE = 256;
+    private int[] RAM; // Eller holder det med en byte-array?
+    private int R; // Register
+    private int PC; // Programteller
+    private boolean run;
+    // Flere instansvariabler?
+
+    public M() {
+        /* Initialisering av instansvariabler */
+        this.RAM = new int[RAM_SIZE];
+        this.PC = 0;
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        /*
+ * Hent filnavn fra kommandolinje (args[0])
+ * Lag et M-objekt
+ * Last program fra fil (loadProgram)
+ * Utfør programmet (executeProgram)
+         */
+        M m = new M();
+        m.loadProgram(args[0]);
+        m.executeProgram();
+    }
+
+    public void loadProgram(String fileName) {
+        /*
+ * Nullstill instansvariabler
+ * Åpne fil
+ * Les inn program fra fil, linje for linje
+ * Lukk fil
+         */
+        run = true;
+        File fil = new File(fileName);
+        Scanner leser = null;
+        try {
+            leser = new Scanner(fil);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(M.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        while (leser.hasNextInt()) {
+            RAM[PC++] = leser.nextInt();
+        }
+        leser.close();
+        PC = 0;
+    }
+
+    public void executeProgram() {
+        /*
+ * Så lenge programmet ikke er avsluttet
+ * Utfør neste instruksjon (stepProgram)
+ * Vis avsluttende melding
+         */
+        while (run) {
+            stepProgram();
+        }
+        /*
+         */
+        System.out.println("Hei då");
+    }
+
+    public void stepProgram() {
         /*
  * Les neste instruksjon fra RAM
  * Utfør instruksjonen (og oppdater programtelleren)
