@@ -1,0 +1,168 @@
+# public void stepProgram() {
+        /*
+ * Les neste instruksjon fra RAM
+ * Utfør instruksjonen (og oppdater programtelleren)
+         */
+        switch (RAM[PC]) {
+            case 10: 
+            // Les inn heltall  
+            {
+                try {
+                    this.R = Integer.parseInt(showInputDialog("Skriv inn et heltall"));
+                    PC++;
+                } catch (NumberFormatException e) {
+                System.out.println("BARE HELETALL (Trykk 0 for å avslutte)");
+                }
+            }
+                break;
+            case 11: // Skriv heltallet i registeret til skjermen
+                System.out.println(R);
+                PC++;
+                break;
+            case 12: {
+                try {
+                    // Les inn et tegn fra tastaturet og lagre tilhørende Ascii-kode
+                    // (0-255) i registeret.
+                    R = (char) System.in.read();
+                    PC++;
+                } catch (IOException ex) {
+                    Logger.getLogger(M.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+                break;
+            case 13: // Skriv tegnet for Ascii-koden som er lagret i registeret til skjermen.
+                System.out.println((char) R);
+                PC++;
+                break;
+            case 20: // Kopier verdien i lagercelle A of set [0, 255] til registeret.
+                if (RAM[PC+1] >= 0 && RAM[PC+1] <= 255) {
+                    R = RAM[RAM[PC+1]];
+                } else {
+                    System.out.println("20: lagerCelle er større en godkjent område [0, 255]");
+                    System.exit(0);
+                }
+                
+                PC+=2;
+                break;
+            case 21: // Kopier verdien i registeret til lagercelle A of set [0, 255]
+                if (RAM[PC+1] >= 0 && RAM[PC+1] <= 255) {
+
+                    R = RAM[RAM[PC+1]];
+                } else {
+                    System.out.println("21: lagerCelle er større en godkjent område [0,255]");
+                    System.exit(0);
+                }
+                RAM[RAM[PC+1]] = R;
+                PC+=2;
+                break;
+            case 22: // Sett verdien av registeret til heltallet N of set [-128, 127]
+                if (RAM[PC+1] >= -128 && RAM[PC+1] <= 127) {
+                    R = RAM[RAM[PC+1]];
+                } else {
+                    System.out.println("22: Er utenfor godkjent område [-128, 127]");
+                    System.exit(0);
+                }
+                R = RAM[PC+1];
+                PC+=2;
+                break;
+            case 30: // Adder verdiene i registeret og lagercelle A of set [0, 255], og
+                // lagre resultatet i registeret.
+                 if (RAM[PC+1] >= 0 && RAM[PC+1] <= 255) {
+                    R += RAM[RAM[PC+1]];
+                } else {
+                    System.out.println("30: lagercelle utenfor godkjent området [0,255]");
+                    //Avslutter programmet
+                    System.exit(0);
+                }
+                R += RAM[RAM[PC+1]];
+                PC+=2;
+                break;
+            case 31: // Substraher verdien i lagercelle A of set [0, 255] fra verdien i
+                // registeret, og lagre resulatatet i registeret.
+                if (RAM[PC+1] >= 0 && RAM[PC+1] <= 255) {
+                    RAM[RAM[PC+1]] -= R;
+                    R = RAM[RAM[PC+1]];
+                } else {
+                    System.out.println("31: lagerCelle utenfor godkjent området [0,255]");
+                }
+                R -= RAM[RAM[PC+1]];
+                PC+=2;
+                break;
+            case 32: // Multipliser verdiene i registeret og lagercelle A of set [0, 255]
+                // og lagre resultatet i registeret.
+                if (RAM[PC+1] >= 0 && RAM[PC+1] <= 255) {
+                    RAM[RAM[PC+1]] = RAM[RAM[PC+1]] * R;
+                    R = RAM[RAM[PC+1]];
+                    // TEST
+                    // System.out.println(RAM[18] + " case 32");
+                } else {
+                    System.out.println("32: lagerCelle utenfor godkjent området [0,255]");
+                }
+                PC+=2;
+                break;
+            case 33: // Divider verdien i registeret med verdien i lagercelle A of set [0, 255],
+                // og lagre resultatet i registeret. Merk: M kan bare regne med heltall, så dette
+                // er heltallsdivisjon.
+                try {
+                    if (RAM[PC+1] >= 0 && RAM[PC+1] <= 255) {
+                        RAM[RAM[PC+1]] = R / RAM[RAM[PC+1]];
+                        R = RAM[RAM[PC+1]];
+                    } else {
+                        System.out.println("33: Er utenfor godkjent område [0,255]");
+                        System.exit(0);
+                    }
+                    PC += 2;
+                } catch (ArithmeticException e) {
+                    JOptionPane.showMessageDialog(null, "Går ikke an å dele med 0");
+                    System.exit(0);
+                }
+                break;
+            case 40: // Sett programtelleren til adresse A i settet [0, 255].
+                if (RAM[PC+1] >= 0 && RAM[PC+1] <= 255) {
+                    this.PC = RAM[PC+1];
+                } else {
+                    System.out.println("40: adresse Ugyldig [0,255]");
+                }
+                break;
+
+            case 41: // Sett programtelleren til adresse A i settet [0, 255], hvis verdien
+                // i registeret er negativ.
+                if (R < 0) {
+                    if (RAM[PC+1] >= 0 && RAM[PC+1]<= 255) {
+                        this.PC = RAM[PC+1];
+                    } else {
+                        System.out.println("40: adresse Ugyldig [0,255]");
+                    }
+                } else {
+                    System.out.println("41: tallet i registeret er posetivt");
+                }
+                if (R < 0) PC = RAM[PC+1];
+                PC+=2;
+                break;
+            case 42: // Sett programtelleren til adresse A i settet [0, 255], hvis verdien
+                // i registeret er 0.
+                if (R == 0) {
+                    if (RAM[PC+1] >= 0 && RAM[PC+1] <= 255) {
+                        // TEST
+                        // System.out.println("funker dette?");
+                        PC = RAM[PC+1];
+                        // TEST
+                        // System.out.println(PC + " case 42");
+                    } else {
+                        System.out.println("42: adresse Ugyldig [0,255]");
+                    }
+                } else {
+                    System.out.println("42: Tallet i registeret er 0     ");
+                    PC += 2;
+                }
+                break;
+            case 50: // Avslutt programmet.
+                this.run = false;
+                break;
+            default: // Default
+        }
+    }
+
+    
+    /* Eventuelle hjelpemetoder */
+}
